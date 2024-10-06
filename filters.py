@@ -35,6 +35,24 @@ def high_pass( img_cv, canvas):
 
     display_image(filtered_img, canvas, original=False)
 
+def high_pass_implemented(img_cv, canvas, sigma=1.0):
+    if img_cv is None:
+        return
+    
+    blurred_img = GuassianBlur(img_cv, sigma)
+    
+    gray_img = cv2.cvtColor(blurred_img, cv2.COLOR_BGR2GRAY)
+
+    laplacian_filtered = cv2.Laplacian(gray_img, cv2.CV_64F)
+    
+    sobelx_filtered = cv2.Sobel(gray_img, cv2.CV_64F, 1, 0, ksize=5)
+    sobely_filtered = cv2.Sobel(gray_img, cv2.CV_64F, 0, 1, ksize=5)
+
+    sobel_combined = cv2.magnitude(sobelx_filtered, sobely_filtered)
+
+    filtered_img = cv2.convertScaleAbs(sobel_combined + laplacian_filtered)
+    display_image(filtered_img, canvas, original=False)
+
 
 def GuassianBlur(img: np.ndarray, sigma: Union[float, int], filter_shape: Union[List, Tuple, None] = None):
     if filter_shape is None:
