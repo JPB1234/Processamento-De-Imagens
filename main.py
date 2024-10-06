@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from image_handler import load_image, display_image
-from filters import low_pass, high_pass, low_pass_implemented
+from filters import low_pass, high_pass, low_pass_implemented, high_pass_implemented
 
 img_cv = None
 
@@ -29,6 +29,8 @@ menu_bar.add_cascade(label="Filters", menu=filters_menu)
 filters_menu.add_command(label="Low Pass Filter", command=lambda: low_pass(img_cv, edited_image_canvas))
 filters_menu.add_command(label="Low Pass Filter Implemented", command=lambda: low_pass_implemented(img_cv, edited_image_canvas))
 filters_menu.add_command(label="High Pass Filter", command=lambda: high_pass(img_cv, edited_image_canvas))
+filters_menu.add_command(label="High Pass Filter Implemented", command=lambda: high_pass_implemented(img_cv, edited_image_canvas))
+
 
 original_image_canvas = tk.Canvas(root, width=500, height=500, bg="#2e2e2e", highlightthickness=1, highlightbackground="white")
 original_image_canvas.grid(row=0, column=0, padx=20, pady=20)
