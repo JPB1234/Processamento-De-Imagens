@@ -11,7 +11,7 @@ def low_pass( img_cv, canvas):
     filtered_img = cv2.GaussianBlur(img_cv, (15, 15), 0)
     display_image(filtered_img, canvas, original=False)
     
-def low_pass_implemented(img_cv, canvas, sigma=1.0):
+def low_pass_gaussian(img_cv, canvas, sigma=3.0):
     if img_cv is None:
         return
 
@@ -25,8 +25,26 @@ def low_pass_implemented(img_cv, canvas, sigma=1.0):
     if not isinstance(filtered_img, np.ndarray):
         raise TypeError("not nparray")
 
+    
     display_image(filtered_img, canvas, original=False)
 
+
+def low_pass_media(img_cv, canvas):
+    if img_cv is None:
+        return
+
+    if not isinstance(img_cv, np.ndarray):
+        img_cv = np.array(img_cv)
+
+    filtered_img = low_pass_mean_filter(img_cv)
+
+    #Ocorreram alguns erros pq a imagem não era um np.array
+    # TODO: Apagar condicional depoius de corrigir o erro.
+    if not isinstance(filtered_img, np.ndarray):
+        raise TypeError("not nparray")
+
+    
+    display_image(filtered_img, canvas, original=False)
 
 def high_pass( img_cv, canvas):
     if img_cv is None:
@@ -38,31 +56,31 @@ def high_pass( img_cv, canvas):
 
     display_image(filtered_img, canvas, original=False)
 
-def high_pass_implemented(img_cv, canvas):
-    if img_cv is None:
-        return
-    
-    if not isinstance(img_cv, np.ndarray):
-        img_cv = np.array(img_cv)
+#def high_pass_laplacian(img_cv, canvas):
+#    if img_cv is None:
+#        return
+#    
+#    if not isinstance(img_cv, np.ndarray):
+#        img_cv = np.array(img_cv)
+#
+#    gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+#    
+#    kernel = np.array([[-1, -1, -1],
+#                           [-1,  8, -1],
+#                           [-1, -1, -1]])
+#
+#    #kernel = np.array([[-1, -1, -1, -1, -1],
+#    #                       [-1,  1,  2,  1, -1],
+#    #                       [-1,  2,  4,  2, -1],
+#    #                       [-1,  1,  2,  1, -1],
+#    #                       [-1, -1, -1, -1, -1]])
+#
+#    filtered_img = cv2.filter2D(gray, -1, kernel)
+#    filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
+#
+#    display_image(filtered_img, canvas, original=False)
 
-    gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-    
-    kernel = np.array([[-1, -1, -1],
-                           [-1,  8, -1],
-                           [-1, -1, -1]])
-
-    #kernel = np.array([[-1, -1, -1, -1, -1],
-    #                       [-1,  1,  2,  1, -1],
-    #                       [-1,  2,  4,  2, -1],
-    #                       [-1,  1,  2,  1, -1],
-    #                       [-1, -1, -1, -1, -1]])
-
-    filtered_img = manual_convolution(gray, kernel)
-    filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
-
-    display_image(filtered_img, canvas, original=False)
-
-def teste_high_pass_dinamic_kernel(img_cv, canvas, kernel_value):
+def high_pass_laplacian(img_cv, canvas, kernel_value):
     if img_cv is None:
         return
 
@@ -84,6 +102,16 @@ def teste_high_pass_dinamic_kernel(img_cv, canvas, kernel_value):
 
     display_image(filtered_img, canvas, original=False)
 
+def high_pass_sobel(img_cv, canvas):
+    if img_cv is None:
+        return
+
+    if not isinstance(img_cv, np.ndarray):
+        img_cv = np.array(img_cv)
+    
+    filtered_img = sobel_filter_manual(img_cv)
+    display_image(filtered_img, canvas, original=False)
+
 def GuassianBlur(img: np.ndarray, sigma: Union[float, int], filter_shape: Union[List, Tuple, None] = None):
     if filter_shape is None:
         shape = 2 * int(4 * sigma + 0.5) + 1
@@ -103,7 +131,7 @@ def GuassianBlur(img: np.ndarray, sigma: Union[float, int], filter_shape: Union[
             exp_term = np.exp(-(x**2.0 + y**2.0) / (2.0 * sigma**2.0))
             gaussian_filter[x + half_x, y + half_y] = normal * exp_term
 
-    blurred = manual_convolution(img, gaussian_filter)
+    blurred = cv2.filter2D(img, -1, gaussian_filter)
 
     return blurred.astype(np.uint8)
 
@@ -128,3 +156,19 @@ def manual_convolution(image, kernel):
     output = np.clip(output, 0, 255)
     
     return output.astype(np.uint8)
+
+def low_pass_mean_filter(img, kernel_size=9):
+    kernel = np.ones((kernel_size, kernel_size), np.float32) / (kernel_size * kernel_size)
+    filtered_img = cv2.filter2D(img, -1, kernel)
+
+    return filtered_img
+
+def sobel_filter_manual(img, direction='x'):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    if direction == 'x':
+            kernel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=np.float32)  # Sobel X
+    elif direction == 'y':
+        kernel = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=np.float32)  # Sobel Y
+    sobel_img = cv2.filter2D(gray, cv2.CV_64F, kernel)
+
+    return cv2.convertScaleAbs(sobel_img)
