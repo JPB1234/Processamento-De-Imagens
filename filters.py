@@ -3,24 +3,44 @@ from typing import Union, List, Tuple
 import numpy as np
 from image_handler import display_image
 
-def aplicar_abertura(img_cv, canvas):
+def erosion(img_cv, canvas, kernel_size = 5):
     if img_cv is None:
         return
-    # Erosão seguida de dilatação
-    kernel = np.ones((5, 5), np.uint8)
-    eroded = cv2.erode(img_cv, kernel, iterations=1)
-    opened = cv2.dilate(eroded, kernel, iterations=1)
-    display_image(opened, canvas, original=False)
+    img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+    pad_size = kernel_size // 2
+    padded_img = np.pad(img_cv, pad_size, mode='constant', constant_values=255)
+    output_img = np.zeros_like(img_cv)
 
-def aplicar_fechamento(img_cv, canvas):
+    for i in range(pad_size, padded_img.shape[0] - pad_size):
+        for j in range(pad_size, padded_img.shape[1] - pad_size):
+            region = padded_img[i - pad_size:i + pad_size + 1, j - pad_size:j + pad_size + 1]
+            output_img[i - pad_size, j - pad_size] = np.min(region)
+    eroded_img = cv2.cvtColor(output_img, cv2.COLOR_GRAY2BGR)
+    display_image(eroded_img, canvas, original=False)
+
+
+def dilatation(img_cv, canvas, kernel_size=5):
     if img_cv is None:
         return
-    # Dilatação seguida de erosão
-    kernel = np.ones((5, 5), np.uint8)
-    dilated = cv2.dilate(img_cv, kernel, iterations=1)
-    closed = cv2.erode(dilated, kernel, iterations=1)
-    display_image(closed, canvas, original=False)
+    img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+    
+    pad_size = kernel_size // 2
+    padded_img = np.pad(img_cv, pad_size, mode='constant', constant_values=0)  # Padding com 0 (preto)
+    
+    output_img = np.zeros_like(img_cv)
 
+    for i in range(pad_size, padded_img.shape[0] - pad_size):
+        for j in range(pad_size, padded_img.shape[1] - pad_size):
+            region = padded_img[i - pad_size:i + pad_size + 1, j - pad_size:j + pad_size + 1]
+            output_img[i - pad_size, j - pad_size] = np.max(region)
+    dilated_img = cv2.cvtColor(output_img, cv2.COLOR_GRAY2BGR)
+    display_image(dilated_img, canvas, original=False)
+
+def open(img_cv, canvas, kernel_size=5):
+    img = erosion(img_cv, canvas, kernel_size)
+    dilatation(img, canvas, kernel_size)
+
+    
 def low_pass(img_cv, canvas):
     if img_cv is None:
         return
@@ -131,3 +151,12 @@ def low_pass_mean_filter(img, kernel_size=9):
     filtered_img = cv2.filter2D(img, -1, kernel)
     return filtered_img
 
+def sobel_filter_manual(img, direction='x'):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    if direction == 'x':
+            kernel = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=np.float32)  # Sobel X
+    elif direction == 'y':
+        kernel = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=np.float32)  # Sobel Y
+    sobel_img = cv2.filter2D(gray, cv2.CV_64F, kernel)
+
+    return cv2.convertScaleAbs(sobel_img)

@@ -2,7 +2,7 @@ import tkinter as tk
 from typing import Union, List, Tuple
 from tkinter import filedialog
 from image_handler import load_image, display_image
-from filters import low_pass, high_pass, low_pass_gaussian, low_pass_media, high_pass_laplacian, high_pass_sobel, aplicar_abertura, aplicar_fechamento
+from filters import low_pass, high_pass, low_pass_gaussian, low_pass_media, high_pass_laplacian, high_pass_sobel, erosion, dilatation
 
 img_cv = None
 
@@ -42,8 +42,8 @@ filters_menu.add_command(label="Low Pass Filter Media", command=lambda: low_pass
 filters_menu.add_command(label="High Pass Filter", command=lambda: high_pass(img_cv, edited_image_canvas))
 filters_menu.add_command(label="High Pass Filter Laplacian", command=lambda: high_pass_slider(root, img_cv, edited_image_canvas))
 filters_menu.add_command(label="High Pass Filter Sobel", command=lambda: high_pass_sobel(img_cv, edited_image_canvas))
-filters_menu.add_command(label="Abertura", command=lambda: aplicar_abertura(img_cv, edited_image_canvas))
-filters_menu.add_command(label="Fechamento", command=lambda: aplicar_fechamento(img_cv, edited_image_canvas))
+filters_menu.add_command(label="Erosion", command=lambda: erosion(img_cv, edited_image_canvas))
+filters_menu.add_command(label="Dilatation", command=lambda: dilatation(img_cv, edited_image_canvas))
 
 original_image_canvas = tk.Canvas(root, width=500, height=500, bg="#2e2e2e", highlightthickness=1, highlightbackground="white")
 original_image_canvas.grid(row=0, column=0, padx=20, pady=20)
