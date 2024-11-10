@@ -38,7 +38,7 @@ def close(img_cv, canvas, kernel_size=5):
     dilated_img = aplying_dilatation(img_cv,kernel_size)
     erosion_img = aplying_dilatation(dilated_img,kernel_size)
     
-    final_img = cv2.cvtColor(dilated_img, cv2.COLOR_GRAY2BGR)
+    final_img = cv2.cvtColor(erosion_img, cv2.COLOR_GRAY2BGR)
     display_image(final_img, canvas, original=False) 
 
     
