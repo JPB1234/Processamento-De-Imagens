@@ -7,14 +7,7 @@ def erosion(img_cv, canvas, kernel_size = 5):
     if img_cv is None:
         return
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-    pad_size = kernel_size // 2
-    padded_img = np.pad(img_cv, pad_size, mode='constant', constant_values=255)
-    output_img = np.zeros_like(img_cv)
-
-    for i in range(pad_size, padded_img.shape[0] - pad_size):
-        for j in range(pad_size, padded_img.shape[1] - pad_size):
-            region = padded_img[i - pad_size:i + pad_size + 1, j - pad_size:j + pad_size + 1]
-            output_img[i - pad_size, j - pad_size] = np.min(region)
+    output_img = aplying_erosion(img_cv,kernel_size)
     eroded_img = cv2.cvtColor(output_img, cv2.COLOR_GRAY2BGR)
     display_image(eroded_img, canvas, original=False)
 
@@ -23,16 +16,8 @@ def dilatation(img_cv, canvas, kernel_size=5):
     if img_cv is None:
         return
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+    output_img = aplying_dilatation(img_cv,kernel_size)
     
-    pad_size = kernel_size // 2
-    padded_img = np.pad(img_cv, pad_size, mode='constant', constant_values=0)  # Padding com 0 (preto)
-    
-    output_img = np.zeros_like(img_cv)
-
-    for i in range(pad_size, padded_img.shape[0] - pad_size):
-        for j in range(pad_size, padded_img.shape[1] - pad_size):
-            region = padded_img[i - pad_size:i + pad_size + 1, j - pad_size:j + pad_size + 1]
-            output_img[i - pad_size, j - pad_size] = np.max(region)
     dilated_img = cv2.cvtColor(output_img, cv2.COLOR_GRAY2BGR)
     display_image(dilated_img, canvas, original=False)
 
@@ -160,3 +145,26 @@ def sobel_filter_manual(img, direction='x'):
     sobel_img = cv2.filter2D(gray, cv2.CV_64F, kernel)
 
     return cv2.convertScaleAbs(sobel_img)
+
+def aplying_erosion(img_cv, kernel_size = 5):
+    pad_size = kernel_size // 2
+    padded_img = np.pad(img_cv, pad_size, mode='constant', constant_values=255)
+    output_img = np.zeros_like(img_cv)
+
+    for i in range(pad_size, padded_img.shape[0] - pad_size):
+        for j in range(pad_size, padded_img.shape[1] - pad_size):
+            region = padded_img[i - pad_size:i + pad_size + 1, j - pad_size:j + pad_size + 1]
+            output_img[i - pad_size, j - pad_size] = np.min(region)
+    return output_img
+
+def aplying_dilatation(img_cv, kernel_size = 5):
+    pad_size = kernel_size // 2
+    padded_img = np.pad(img_cv, pad_size, mode='constant', constant_values=0)
+    
+    output_img = np.zeros_like(img_cv)
+
+    for i in range(pad_size, padded_img.shape[0] - pad_size):
+        for j in range(pad_size, padded_img.shape[1] - pad_size):
+            region = padded_img[i - pad_size:i + pad_size + 1, j - pad_size:j + pad_size + 1]
+            output_img[i - pad_size, j - pad_size] = np.max(region)
+    return output_img
