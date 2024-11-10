@@ -1,6 +1,4 @@
 import tkinter as tk
-from typing import Union, List, Tuple
-from tkinter import filedialog
 from image_handler import load_image, display_image
 from filters import *
 
@@ -42,7 +40,7 @@ filters_menu.add_command(label="Low Pass Filter Media", command=lambda: low_pass
 filters_menu.add_command(label="High Pass Filter", command=lambda: high_pass(img_cv, edited_image_canvas))
 filters_menu.add_command(label="High Pass Filter Laplacian", command=lambda: high_pass_slider(root, img_cv, edited_image_canvas))
 filters_menu.add_command(label="High Pass Filter Sobel", command=lambda: high_pass_sobel(img_cv, edited_image_canvas))
-filters_menu.add_command(label="Limiarização (Thresholding)", command=lambda: manual_thresholding_segmentation(img_cv, edited_image_canvas))
+filters_menu.add_command(label="Limiarização (Thresholding)", command=lambda: thresholding_segmentation(img_cv, edited_image_canvas))
 filters_menu.add_command(label="Limiarização Adaptativa", command=lambda: otsu_segmentation(img_cv, edited_image_canvas))
 filters_menu.add_command(label="Erosion", command=lambda: erosion(img_cv, edited_image_canvas))
 filters_menu.add_command(label="Dilatation", command=lambda: dilatation(img_cv, edited_image_canvas))
