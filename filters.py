@@ -22,8 +22,24 @@ def dilatation(img_cv, canvas, kernel_size=5):
     display_image(dilated_img, canvas, original=False)
 
 def open(img_cv, canvas, kernel_size=5):
-    img = erosion(img_cv, canvas, kernel_size)
-    dilatation(img, canvas, kernel_size)
+    if img_cv is None:
+        return
+    img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+    erosion_img = aplying_dilatation(img_cv,kernel_size)
+    dilated_img = aplying_dilatation(erosion_img,kernel_size)
+    
+    final_img = cv2.cvtColor(dilated_img, cv2.COLOR_GRAY2BGR)
+    display_image(final_img, canvas, original=False) 
+
+def close(img_cv, canvas, kernel_size=5):
+    if img_cv is None:
+        return
+    img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+    dilated_img = aplying_dilatation(img_cv,kernel_size)
+    erosion_img = aplying_dilatation(dilated_img,kernel_size)
+    
+    final_img = cv2.cvtColor(dilated_img, cv2.COLOR_GRAY2BGR)
+    display_image(final_img, canvas, original=False) 
 
     
 def low_pass(img_cv, canvas):
