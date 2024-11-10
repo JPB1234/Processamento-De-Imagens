@@ -4,16 +4,12 @@ import numpy as np
 from image_handler import display_image
 
 
-def manual_thresholding_segmentation(img_cv, canvas):
+def thresholding_segmentation(img_cv, canvas):
     if img_cv is None:
         return
 
     gray_img = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-
-    threshold_value = 90
-    binary_img = np.zeros_like(gray_img)
-    
-    binary_img[gray_img >= threshold_value] = 255
+    binary_img = aplying_thresholding(gray_img)
 
     binary_img_bgr = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
     display_image(binary_img_bgr, canvas, original=False)
@@ -25,40 +21,9 @@ def otsu_segmentation(img_cv, canvas):
 
     gray_img = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
 
-    hist, bins = np.histogram(gray_img.flatten(), 256, [0, 256])
-    
-    total_pixels = gray_img.size
-    probabilities = hist / total_pixels
+    binary_img = aplying_thresholding(gray_img)
 
-    current_max, threshold_value = 0, 0
-    sum_total, sum_foreground, weight_background = 0, 0, 0
-
-    for i in range(256):
-        sum_total += i * probabilities[i]
-
-    for i in range(256):
-        weight_background += probabilities[i]
-        if weight_background == 0:
-            continue
-        weight_foreground = 1 - weight_background
-        if weight_foreground == 0:
-            break
-
-        sum_foreground += i * probabilities[i]
-
-        mean_background = sum_foreground / weight_background
-        mean_foreground = (sum_total - sum_foreground) / weight_foreground
-
-        between_class_variance = weight_background * weight_foreground * (mean_background - mean_foreground) ** 2
-
-        if between_class_variance > current_max:
-            current_max = between_class_variance
-            threshold_value = i
-
-    otsu_img = np.zeros_like(gray_img)
-    otsu_img[gray_img >= threshold_value] = 255
-
-    otsu_img_bgr = cv2.cvtColor(otsu_img, cv2.COLOR_GRAY2BGR)
+    otsu_img_bgr = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
     display_image(otsu_img_bgr, canvas, original=False)
 
 def erosion(img_cv, canvas, kernel_size = 5):
@@ -83,7 +48,8 @@ def open(img_cv, canvas, kernel_size=5):
     if img_cv is None:
         return
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-    erosion_img = aplying_erosion(img_cv,kernel_size)
+    segment_img = aplying_otsu(img_cv)
+    erosion_img = aplying_erosion(segment_img,kernel_size)
     dilated_img = aplying_dilatation(erosion_img,kernel_size)
     
     final_img = cv2.cvtColor(dilated_img, cv2.COLOR_GRAY2BGR)
@@ -93,7 +59,8 @@ def close(img_cv, canvas, kernel_size=5):
     if img_cv is None:
         return
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-    dilated_img = aplying_dilatation(img_cv,kernel_size)
+    segment_img = aplying_thresholding(img_cv)
+    dilated_img = aplying_dilatation(segment_img,kernel_size)
     erosion_img = aplying_erosion(dilated_img,kernel_size)
     
     final_img = cv2.cvtColor(erosion_img, cv2.COLOR_GRAY2BGR)
@@ -242,3 +209,47 @@ def aplying_dilatation(img_cv, kernel_size = 5):
             region = padded_img[i - pad_size:i + pad_size + 1, j - pad_size:j + pad_size + 1]
             output_img[i - pad_size, j - pad_size] = np.max(region)
     return output_img
+
+def aplying_otsu(gray_img):
+    hist, bins = np.histogram(gray_img.flatten(), 256, [0, 256])
+    
+    total_pixels = gray_img.size
+    probabilities = hist / total_pixels
+
+    current_max, threshold_value = 0, 0
+    sum_total, sum_foreground, weight_background = 0, 0, 0
+
+    for i in range(256):
+        sum_total += i * probabilities[i]
+
+    for i in range(256):
+        weight_background += probabilities[i]
+        if weight_background == 0:
+            continue
+        weight_foreground = 1 - weight_background
+        if weight_foreground == 0:
+            break
+
+        sum_foreground += i * probabilities[i]
+
+        mean_background = sum_foreground / weight_background
+        mean_foreground = (sum_total - sum_foreground) / weight_foreground
+
+        between_class_variance = weight_background * weight_foreground * (mean_background - mean_foreground) ** 2
+
+        if between_class_variance > current_max:
+            current_max = between_class_variance
+            threshold_value = i
+
+    otsu_img = np.zeros_like(gray_img)
+    otsu_img[gray_img >= threshold_value] = 255
+    return otsu_img
+
+def aplying_thresholding(gray_img):
+    
+    threshold_value = 90
+    binary_img = np.zeros_like(gray_img)
+    
+    binary_img[gray_img >= threshold_value] = 255
+
+    return binary_img
