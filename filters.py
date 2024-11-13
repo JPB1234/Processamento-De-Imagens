@@ -21,7 +21,7 @@ def otsu_segmentation(img_cv, canvas):
 
     gray_img = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
 
-    binary_img = aplying_thresholding(gray_img)
+    binary_img = aplying_otsu(gray_img)
 
     otsu_img_bgr = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
     display_image(otsu_img_bgr, canvas, original=False)
