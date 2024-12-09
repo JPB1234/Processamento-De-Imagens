@@ -1,6 +1,6 @@
 import tkinter as tk
 from image_handler import load_image, display_image
-from filters2 import *
+from filters import *
 
 img_cv = None
 processed_img_cv = None  

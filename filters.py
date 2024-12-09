@@ -4,7 +4,7 @@ import numpy as np
 from image_handler import display_image
 
 
-def thresholding_segmentation(img_cv, canvas):
+def thresholding_segmentation(img_cv,  *args, **kwargs):
     if img_cv is None:
         return
 
@@ -12,10 +12,10 @@ def thresholding_segmentation(img_cv, canvas):
     binary_img = aplying_thresholding(gray_img)
 
     binary_img_bgr = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
-    display_image(binary_img_bgr, canvas, original=False)
+    return binary_img_bgr
 
 
-def otsu_segmentation(img_cv, canvas):
+def otsu_segmentation(img_cv, *args, **kwargs):
     if img_cv is None:
         return
 
@@ -24,27 +24,26 @@ def otsu_segmentation(img_cv, canvas):
     binary_img = aplying_otsu(gray_img)
 
     otsu_img_bgr = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
-    display_image(otsu_img_bgr, canvas, original=False)
+    return otsu_img_bgr
 
-def erosion(img_cv, canvas, kernel_size = 5):
+def erosion(img_cv, kernel_size = 5, *args, **kwargs):
     if img_cv is None:
         return
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
     output_img = aplying_erosion(img_cv,kernel_size)
     eroded_img = cv2.cvtColor(output_img, cv2.COLOR_GRAY2BGR)
-    display_image(eroded_img, canvas, original=False)
+    return eroded_img
 
-
-def dilatation(img_cv, canvas, kernel_size=5):
+def dilatation(img_cv, kernel_size=5, *args, **kwargs):
     if img_cv is None:
         return
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
     output_img = aplying_dilatation(img_cv,kernel_size)
     
     dilated_img = cv2.cvtColor(output_img, cv2.COLOR_GRAY2BGR)
-    display_image(dilated_img, canvas, original=False)
+    return dilated_img
 
-def open(img_cv, canvas, kernel_size=5):
+def open(img_cv, kernel_size=5, *args, **kwargs):
     if img_cv is None:
         return
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
@@ -53,9 +52,9 @@ def open(img_cv, canvas, kernel_size=5):
     dilated_img = aplying_dilatation(erosion_img,kernel_size)
     
     final_img = cv2.cvtColor(dilated_img, cv2.COLOR_GRAY2BGR)
-    display_image(final_img, canvas, original=False) 
+    return final_img
 
-def close(img_cv, canvas, kernel_size=5):
+def close(img_cv, kernel_size=5, *args, **kwargs):
     if img_cv is None:
         return
     img_cv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
@@ -64,16 +63,16 @@ def close(img_cv, canvas, kernel_size=5):
     erosion_img = aplying_erosion(dilated_img,kernel_size)
     
     final_img = cv2.cvtColor(erosion_img, cv2.COLOR_GRAY2BGR)
-    display_image(final_img, canvas, original=False) 
+    return final_img
 
     
-def low_pass(img_cv, canvas):
+def low_pass(img_cv, *args, **kwargs):
     if img_cv is None:
         return
     filtered_img = cv2.GaussianBlur(img_cv, (15, 15), 0)
-    display_image(filtered_img, canvas, original=False)
+    return filtered_img
 
-def low_pass_gaussian(img_cv, canvas, sigma=3.0):
+def low_pass_gaussian(img_cv, sigma=3.0, *args, **kwargs):
     if img_cv is None:
         return
 
@@ -83,10 +82,9 @@ def low_pass_gaussian(img_cv, canvas, sigma=3.0):
     filtered_img = GuassianBlur(img_cv, sigma)
     if not isinstance(filtered_img, np.ndarray):
         raise TypeError("not nparray")
-    
-    display_image(filtered_img, canvas, original=False)
+    return filtered_img
 
-def low_pass_media(img_cv, canvas):
+def low_pass_media(img_cv, *args, **kwargs):
     if img_cv is None:
         return
 
@@ -96,19 +94,18 @@ def low_pass_media(img_cv, canvas):
     filtered_img = low_pass_mean_filter(img_cv)
     if not isinstance(filtered_img, np.ndarray):
         raise TypeError("not nparray")
-    
-    display_image(filtered_img, canvas, original=False)
+    return filtered_img
 
-def high_pass(img_cv, canvas):
+def high_pass(img_cv, *args, **kwargs):
     if img_cv is None:
         return
     gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
     filtered_img = cv2.Laplacian(gray, cv2.CV_64F)
     filtered_img = cv2.convertScaleAbs(filtered_img)
     filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
-    display_image(filtered_img, canvas, original=False)
+    return filtered_img
 
-def high_pass_laplacian(img_cv, canvas, kernel_value):
+def high_pass_laplacian(img_cv, kernel_value, *args, **kwargs):
     if img_cv is None:
         return
 
@@ -125,9 +122,9 @@ def high_pass_laplacian(img_cv, canvas, kernel_value):
 
     filtered_img = cv2.filter2D(gray, -1, kernel)
     filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_GRAY2BGR)
-    display_image(filtered_img, canvas, original=False)
+    return filtered_img
 
-def high_pass_sobel(img_cv, canvas):
+def high_pass_sobel(img_cv, *args, **kwargs):
     if img_cv is None:
         return
 
@@ -135,7 +132,7 @@ def high_pass_sobel(img_cv, canvas):
         img_cv = np.array(img_cv)
     
     filtered_img = sobel_filter_manual(img_cv)
-    display_image(filtered_img, canvas, original=False)
+    return filtered_img
 
 def GuassianBlur(img: np.ndarray, sigma: Union[float, int], filter_shape: Union[List, Tuple, None] = None):
     if filter_shape is None:
