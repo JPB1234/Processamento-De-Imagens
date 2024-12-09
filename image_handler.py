@@ -3,11 +3,14 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import tkinter as tk
 
-def load_image(canvas):
+def load_image(canvas, edited_image_canvas):
     file_path = filedialog.askopenfilename()
     if file_path:
         img_cv = cv2.imread(file_path)
         display_image(img_cv, canvas, original=True)
+        edited_image_canvas.delete("all")
+        if edited_image_canvas is None:
+            return img_cv
         return img_cv
     return None
 

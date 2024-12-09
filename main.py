@@ -12,7 +12,6 @@ def high_pass_slider(root, img_cv, canvas):
     def on_slider_change(value):
         kernel_value = int(value)
         high_pass_laplacian(img_cv, canvas, kernel_value)
-    
     slider = tk.Scale(root, from_=1, to=15, orient=tk.HORIZONTAL, label="Kernel", command=on_slider_change)
     slider.grid(row=0, column=0, padx=50, pady=50)
     slider.set(3)
@@ -28,7 +27,7 @@ root.config(menu=menu_bar)
 
 file_menu = tk.Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="File", menu=file_menu)
-file_menu.add_command(label="Load Image", command=lambda: set_img_cv(load_image(original_image_canvas)))
+file_menu.add_command(label="Load Image", command=lambda: set_img_cv(load_image(original_image_canvas, edited_image_canvas)))
 file_menu.add_separator()
 file_menu.add_command(label="Exit", command=root.quit)
 
