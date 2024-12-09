@@ -4,6 +4,7 @@ from filters import *
 
 img_cv = None
 processed_img_cv = None
+slider_window_ref = None  
 
 
 def set_img_cv(img):
@@ -22,16 +23,23 @@ def apply_filter(filter_function, canvas, *args, **kwargs):
 
 
 def slider_window(root, canvas, filter_function, label, param_name, param_range, default_value):
-    slider_window = tk.Toplevel(root)
-    slider_window.title(f"{label} Slider")
+    global slider_window_ref
+
+    # Fecha a janela anterior, se existir
+    if slider_window_ref is not None:
+        slider_window_ref.destroy()
+
+    # Cria uma nova janela do slider
+    slider_window_ref = tk.Toplevel(root)
+    slider_window_ref.title(f"{label} Slider")
 
     def on_slider_change(value):
         nonlocal default_value
-        default_value = int(value)  # Atualiza o valor default com o slider
+        default_value = int(value)  # Atualiza o valor padrão com o slider
         apply_filter(filter_function, canvas, **{param_name: default_value})
 
     slider = tk.Scale(
-        slider_window,
+        slider_window_ref,
         from_=param_range[0],
         to=param_range[1],
         orient=tk.HORIZONTAL,
@@ -54,7 +62,7 @@ root.config(menu=menu_bar)
 
 file_menu = tk.Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="File", menu=file_menu)
-file_menu.add_command(label="Load Image", command=lambda: set_img_cv(load_image(original_image_canvas, edited_image_canvas)))
+file_menu.add_command(label="Load Image", command=lambda: set_img_cv(load_image(original_image_canvas, edited_image_canvas, slider_window_ref)))
 file_menu.add_command(label="Exit", command=root.quit)
 
 filters_menu = tk.Menu(menu_bar, tearoff=0)

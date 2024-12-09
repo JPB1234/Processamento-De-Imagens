@@ -3,17 +3,18 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import tkinter as tk
 
-def load_image(canvas, edited_image_canvas, slider=None):
+def load_image(canvas, edited_image_canvas, slider_window_ref = None):
+
     file_path = filedialog.askopenfilename()
     if file_path:
-        if slider is not None:
-            slider.destroy()
-        
+        # Fecha a janela do slider, se existir
+        if slider_window_ref is not None:
+            slider_window_ref.destroy()
+            slider_window_ref = None
+
         img_cv = cv2.imread(file_path)
         display_image(img_cv, canvas, original=True)
         edited_image_canvas.delete("all")
-        if edited_image_canvas is None:
-            return img_cv
         return img_cv
     return None
 
