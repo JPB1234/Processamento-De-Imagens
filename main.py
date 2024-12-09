@@ -42,8 +42,7 @@ root.config(menu=menu_bar)
 
 file_menu = tk.Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="File", menu=file_menu)
-file_menu.add_command(label="Load Image", command=lambda: set_img_cv(load_image(original_image_canvas)))
-file_menu.add_separator()
+file_menu.add_command(label="Load Image", command=lambda: set_img_cv(load_image(original_image_canvas, edited_image_canvas)))
 file_menu.add_command(label="Exit", command=root.quit)
 
 filters_menu = tk.Menu(menu_bar, tearoff=0)
