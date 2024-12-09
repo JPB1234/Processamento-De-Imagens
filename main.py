@@ -4,6 +4,7 @@ from filters import *
 
 img_cv = None
 processed_img_cv = None  
+slider = None
 
 def set_img_cv(img):
     global img_cv, processed_img_cv
@@ -19,6 +20,9 @@ def apply_filter(filter_function, canvas, *args, **kwargs):
     display_image(processed_img_cv, canvas, original=False)  
 
 def high_pass_slider(root, canvas):
+    global slider  # Declare como global para reutilizar em `load_image`
+    if slider is not None:
+        slider.destroy()  # Remova o controle deslizante existente
     def on_slider_change(value):
         global processed_img_cv
         if processed_img_cv is None:
@@ -27,7 +31,7 @@ def high_pass_slider(root, canvas):
         processed_img_cv = high_pass_laplacian(processed_img_cv, kernel_value)  # Atualiza a imagem processada
         display_image(processed_img_cv, canvas, original=False)
 
-    slider = tk.Scale(root, from_=1, to=15, orient=tk.HORIZONTAL, label="Kernel", command=on_slider_change)
+    slider = tk.Scale(root, from_=3, to=15, orient=tk.HORIZONTAL, label="Kernel", command=on_slider_change)
     slider.grid(row=0, column=0, padx=50, pady=50)
     slider.set(3)
 
@@ -42,7 +46,7 @@ root.config(menu=menu_bar)
 
 file_menu = tk.Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label="File", menu=file_menu)
-file_menu.add_command(label="Load Image", command=lambda: set_img_cv(load_image(original_image_canvas, edited_image_canvas)))
+file_menu.add_command(label="Load Image", command=lambda: set_img_cv(load_image(original_image_canvas, edited_image_canvas, slider      )))
 file_menu.add_command(label="Exit", command=root.quit)
 
 filters_menu = tk.Menu(menu_bar, tearoff=0)
